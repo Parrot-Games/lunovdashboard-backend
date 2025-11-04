@@ -1,0 +1,19 @@
+{
+  "name": "lunovdashboard-backend",
+  "version": "1.0.0",
+  "description": "Backend for Lunov Discord bot dashboard",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2",
+    "express-session": "^1.17.3",
+    "node-fetch": "^3.3.2",
+    "passport": "^0.7.0",
+    "passport-discord": "^0.1.4"
+  }
+}
