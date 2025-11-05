@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunov Dashboard — Commands</title>
+    <link rel="icon" href="assets/cropped_circle_image.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #818cf8;
+            --secondary: #06b6d4;
+            --secondary-dark: #0891b2;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(99, 102, 241, 0.2);
+            --header-height: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 10%, rgba(6, 182, 212, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(79, 70, 229, 0.05) 0%, transparent 20%);
+            z-index: -1;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--primary-dark), var(--secondary-dark));
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: var(--light);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--light);
+        }
+
+        p {
+            color: var(--gray-light);
+            margin-bottom: 1rem;
+        }
+
+        /* ===== LAYOUT ===== */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+        }
+
+        .section-title p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--light);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(79, 70, 229, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--light);
+            border: 2px solid var(--gray);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            height: 70px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            transition: transform 0.5s ease;
+        }
+
+        .logo:hover .logo-icon {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+
+        .logo-text a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav a {
+            color: var(--gray-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--light);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        nav a.active {
+            color: var(--primary);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 1px;
+        }
+
+        .account-btn {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-left: 10px;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+
+        .account-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.5);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background: var(--light);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--darker);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 80px 20px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: left 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar a {
+            color: var(--gray-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            color: var(--light);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 998;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* ===== COMMANDS SECTION ===== */
+        .commands {
+            padding: 140px 0 80px;
+        }
+
+        .commands-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .commands-header h1 {
+            margin-bottom: 15px;
+        }
+
+        .commands-header p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--gray-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-tab:hover {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--light);
+        }
+
+        .category-tab.active {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .commands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .command-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .command-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .command-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .command-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--light);
+            margin-bottom: 5px;
+        }
+
+        .command-category {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(79, 70, 229, 0.2);
+            color: var(--primary-light);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .command-description {
+            color: var(--gray-light);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .command-usage {
+            background: var(--darker);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            color: var(--light);
+            border-left: 3px solid var(--primary);
+        }
+
+        .command-usage .prefix {
+            color: var(--primary);
+        }
+
+        .command-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .command-permissions {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+            grid-column: 1 / -1;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--darker);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .footer-main {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .footer-brand {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .footer-logo span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+        }
+
+        .footer-brand p {
+            max-width: 300px;
+            color: var(--gray);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .footer-column {
+            min-width: 150px;
+        }
+
+        .footer-column h4 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--light);
+            position: relative;
+        }
+
+        .footer-column h4::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 1px;
+        }
+
+        .footer-column a {
+            display: block;
+            color: var(--gray);
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--gray);
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-bottom-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-bottom-links a:hover {
+            color: var(--primary);
+        }
+
+        /* ===== RESPONSIVE STYLES ===== */
+        @media (max-width: 992px) {
+            h1 {
+                font-size: 2.8rem;
+            }
+            
+            h2 {
+                font-size: 2.2rem;
+            }
+            
+            .commands-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.3rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            nav {
+                display: none;
+            }
+            
+            .hamburger {
+                display: flex;
+            }
+            
+            .category-tabs {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .footer-main {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .footer-links {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            section {
+                padding: 60px 0;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.6rem;
+            }
+            
+            .commands-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .footer-column {
+                min-width: 100%;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <img class="logo-icon" src="assets/cropped_circle_image.png" alt="Lunov Logo">
+            <div class="logo-text"><a href="https://lunov.rf.gd/">Lunov</a></div>
+        </div>
+        <nav>
+            <a href="https://lunov.rf.gd/"><i class="fas fa-home"></i> Home</a>
+            <a href="https://lunov.rf.gd/commands.html" class="active"><i class="fas fa-terminal"></i> Commands</a>
+            <a href="https://lunov.rf.gd/servers.html"><i class="fas fa-server"></i> Servers</a>
+            <a href="https://lunov.rf.gd/changelogs.html"><i class="fas fa-clipboard-list"></i> Changelogs</a>
+            <a href="https://discord.gg/bQaDPh3fbF" target="_blank"><i class="fas fa-headset"></i> Support</a>
+            <a href="#" class="account-btn"><i class="fas fa-user"></i> Account</a>
+        </nav>
+        <div class="hamburger" id="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+</header>
+
+<!-- Sidebar (Mobile Navigation) -->
+<div class="sidebar" id="sidebar">
+    <a href="https://lunov.rf.gd/"><i class="fas fa-home"></i> Home</a>
+    <a href="https://lunov.rf.gd/commands.html" class="active"><i class="fas fa-terminal"></i> Commands</a>
+    <a href="https://lunov.rf.gd/servers.html"><i class="fas fa-server"></i> Servers</a>
+    <a href="https://lunov.rf.gd/changelogs.html"><i class="fas fa-clipboard-list"></i> Changelogs</a>
+    <a href="https://discord.gg/bQaDPh3fbF" target="_blank"><i class="fas fa-headset"></i> Support</a>
+    <a href="#" class="account-btn"><i class="fas fa-user"></i> Account</a>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<!-- Commands Section -->
+<section class="commands">
+    <div class="container">
+        <div class="commands-header fade-in">
+            <h1>Command List</h1>
+            <p>Explore Lunov's extensive command library with 80+ commands to enhance your Discord server</p>
+        </div>
+        
+        <div class="search-container fade-in delay-1">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-box" id="searchBox" placeholder="Search commands...">
+        </div>
+        
+        <div class="category-tabs fade-in delay-2" id="categoryTabs">
+            <!-- Category tabs will be dynamically generated -->
+        </div>
+        
+        <div class="commands-grid" id="commandsGrid">
+            <!-- Command cards will be dynamically generated -->
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="assets/cropped_circle_image.png" alt="Lunov Logo">
+                        <span>Lunov</span>
+                    </div>
+                    <p>A powerful multipurpose Discord bot designed to enhance your server management and community engagement.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Navigation</h4>
+                        <a href="/index">Home</a>
+                        <a href="/commands">Commands</a>
+                        <a href="/servers">Servers</a>
+                        <a href="/changelogs">Changelogs</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <a href="https://discord.gg/bQaDPh3fbF" target="_blank">Support Server</a>
+                        <a href="#">Documentation</a>
+                        <a href="https://discord.com/oauth2/authorize?client_id=1424366813789028412&permissions=268634146&integration_type=0&scope=bot+applications.commands">Invite Lunov</a>
+                        <a href="#">Status</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="terms-of-services">Terms of Service</a>
+                        <a href="privacy-policy">Privacy Policy</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">GDPR</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>&copy; 2025 Lunov Dashboard. All Rights Reserved.</div>
+                <div class="footer-bottom-links">
+                    <a href="https://lunov.rf.gd/">Home</a>
+                    <a href="https://lunov.rf.gd/commands.html">Commands</a>
+                    <a href="https://lunov.rf.gd/changelogs.html">Changelogs</a>
+                    <a href="https://discord.gg/bQaDPh3fbF" target="_blank">Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Command data
+    const commandData = [
+        // Moderation Commands
+        {
+            id: 1,
+            name: "ban",
+            description: "Bans a user from the server with an optional reason",
+            usage: "ln.ban @user [reason]",
+            category: "moderation",
+            permissions: "Ban Members"
+        },
+        {
+            id: 2,
+            name: "kick",
+            description: "Kicks a user from the server",
+            usage: "ln.kick @user [reason]",
+            category: "moderation",
+            permissions: "Kick Members"
+        },
+        {
+            id: 3,
+            name: "mute",
+            description: "Mutes a user for a specified duration",
+            usage: "ln.mute @user [duration] [reason]",
+            category: "moderation",
+            permissions: "Manage Roles"
+        },
+        {
+            id: 4,
+            name: "clear",
+            description: "Deletes a specified number of messages",
+            usage: "ln.clear [amount]",
+            category: "moderation",
+            permissions: "Manage Messages"
+        },
+        {
+            id: 5,
+            name: "warn",
+            description: "Issues a warning to a user",
+            usage: "ln.warn @user [reason]",
+            category: "moderation",
+            permissions: "Manage Messages"
+        },
+        
+        // Music Commands
+        {
+            id: 6,
+            name: "play",
+            description: "Plays a song from YouTube, Spotify, or SoundCloud",
+            usage: "ln.play [song name/URL]",
+            category: "music",
+            permissions: "None"
+        },
+        {
+            id: 7,
+            name: "skip",
+            description: "Skips the currently playing song",
+            usage: "ln.skip",
+            category: "music",
+            permissions: "None"
+        },
+        {
+            id: 8,
+            name: "queue",
+            description: "Shows the current music queue",
+            usage: "ln.queue",
+            category: "music",
+            permissions: "None"
+        },
+        {
+            id: 9,
+            name: "volume",
+            description: "Adjusts the music volume",
+            usage: "ln.volume [1-100]",
+            category: "music",
+            permissions: "None"
+        },
+        {
+            id: 10,
+            name: "stop",
+            description: "Stops the music and clears the queue",
+            usage: "ln.stop",
+            category: "music",
+            permissions: "None"
+        },
+        
+        // Economy Commands
+        {
+            id: 11,
+            name: "balance",
+            description: "Shows your current balance",
+            usage: "ln.balance [@user]",
+            category: "economy",
+            permissions: "None"
+        },
+        {
+            id: 12,
+            name: "daily",
+            description: "Claims your daily reward",
+            usage: "ln.daily",
+            category: "economy",
+            permissions: "None"
+        },
+        {
+            id: 13,
+            name: "gamble",
+            description: "Gamble your coins for a chance to win more",
+            usage: "ln.gamble [amount]",
+            category: "economy",
+            permissions: "None"
+        },
+        {
+            id: 14,
+            name: "shop",
+            description: "Opens the item shop",
+            usage: "ln.shop",
+            category: "economy",
+            permissions: "None"
+        },
+        {
+            id: 15,
+            name: "buy",
+            description: "Purchases an item from the shop",
+            usage: "ln.buy [item]",
+            category: "economy",
+            permissions: "None"
+        },
+        
+        // Utility Commands
+        {
+            id: 16,
+            name: "help",
+            description: "Shows the help menu with all commands",
+            usage: "ln.help [command]",
+            category: "utility",
+            permissions: "None"
+        },
+        {
+            id: 17,
+            name: "ping",
+            description: "Shows the bot's latency",
+            usage: "ln.ping",
+            category: "utility",
+            permissions: "None"
+        },
+        {
+            id: 18,
+            name: "serverinfo",
+            description: "Displays information about the server",
+            usage: "ln.serverinfo",
+            category: "utility",
+            permissions: "None"
+        },
+        {
+            id: 19,
+            name: "userinfo",
+            description: "Shows information about a user",
+            usage: "ln.userinfo [@user]",
+            category: "utility",
+            permissions: "None"
+        },
+        {
+            id: 20,
+            name: "avatar",
+            description: "Shows a user's avatar",
+            usage: "ln.avatar [@user]",
+            category: "utility",
+            permissions: "None"
+        },
+        
+        // Fun Commands
+        {
+            id: 21,
+            name: "meme",
+            description: "Sends a random meme",
+            usage: "ln.meme",
+            category: "fun",
+            permissions: "None"
+        },
+        {
+            id: 22,
+            name: "8ball",
+            description: "Ask the magic 8ball a question",
+            usage: "ln.8ball [question]",
+            category: "fun",
+            permissions: "None"
+        },
+        {
+            id: 23,
+            name: "trivia",
+            description: "Starts a trivia game",
+            usage: "ln.trivia",
+            category: "fun",
+            permissions: "None"
+        },
+        {
+            id: 24,
+            name: "coinflip",
+            description: "Flips a coin",
+            usage: "ln.coinflip",
+            category: "fun",
+            permissions: "None"
+        },
+        {
+            id: 25,
+            name: "rps",
+            description: "Play rock paper scissors with the bot",
+            usage: "ln.rps [choice]",
+            category: "fun",
+            permissions: "None"
+        }
+    ];
+
+    // Category data with icons
+    const categories = [
+        { id: "all", name: "All Commands", icon: "fas fa-list" },
+        { id: "moderation", name: "Moderation", icon: "fas fa-shield-alt" },
+        { id: "music", name: "Music", icon: "fas fa-music" },
+        { id: "economy", name: "Economy", icon: "fas fa-coins" },
+        { id: "utility", name: "Utility", icon: "fas fa-tools" },
+        { id: "fun", name: "Fun", icon: "fas fa-gamepad" }
+    ];
+
+    // DOM elements
+    const categoryTabs = document.getElementById('categoryTabs');
+    const commandsGrid = document.getElementById('commandsGrid');
+    const searchBox = document.getElementById('searchBox');
+
+    // State variables
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    // Initialize the page
+    function init() {
+        renderCategoryTabs();
+        renderCommands();
+        setupEventListeners();
+        
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
+        
+        // Mobile navigation toggle
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        if (hamburger && sidebar && overlay) {
+            hamburger.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                hamburger.classList.toggle('active');
+            });
+            
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        }
+        
+        // Add fade-in animations to elements when they come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all elements with the fade-in class
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+    }
+
+    // Render category tabs
+    function renderCategoryTabs() {
+        categoryTabs.innerHTML = '';
+        
+        categories.forEach(category => {
+            const tab = document.createElement('div');
+            tab.className = `category-tab ${category.id === currentCategory ? 'active' : ''}`;
+            tab.dataset.category = category.id;
+            
+            tab.innerHTML = `
+                <i class="${category.icon}"></i>
+                <span>${category.name}</span>
+            `;
+            
+            tab.addEventListener('click', () => {
+                currentCategory = category.id;
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                renderCommands();
+            });
+            
+            categoryTabs.appendChild(tab);
+        });
+    }
+
+    // Render commands based on current category and search query
+    function renderCommands() {
+        commandsGrid.innerHTML = '';
+        
+        // Filter commands based on category and search query
+        const filteredCommands = commandData.filter(command => {
+            const matchesCategory = currentCategory === 'all' || command.category === currentCategory;
+            const matchesSearch = command.name.includes(searchQuery.toLowerCase()) || 
+                                command.description.toLowerCase().includes(searchQuery.toLowerCase());
+            return matchesCategory && matchesSearch;
+        });
+        
+        if (filteredCommands.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'no-results fade-in';
+            noResults.innerHTML = `
+                <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                <h3>No commands found</h3>
+                <p>Try adjusting your search or selecting a different category</p>
+            `;
+            commandsGrid.appendChild(noResults);
+            return;
+        }
+        
+        // Create command cards
+        filteredCommands.forEach((command, index) => {
+            const commandCard = document.createElement('div');
+            commandCard.className = 'command-card fade-in';
+            commandCard.style.animationDelay = `${index * 0.05}s`;
+            
+            commandCard.innerHTML = `
+                <div class="command-header">
+                    <div>
+                        <div class="command-name">${command.name}</div>
+                        <span class="command-category">${command.category}</span>
+                    </div>
+                </div>
+                <div class="command-description">${command.description}</div>
+                <div class="command-usage">
+                    <span class="prefix">ln.</span>${command.usage.replace('ln.', '')}
+                </div>
+                <div class="command-footer">
+                    <div class="command-permissions">
+                        <i class="fas fa-user-shield"></i>
+                        <span>${command.permissions}</span>
+                    </div>
+                </div>
+            `;
+            
+            commandsGrid.appendChild(commandCard);
+        });
+    }
+
+    // Set up event listeners
+    function setupEventListeners() {
+        // Search functionality
+        searchBox.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            renderCommands();
+        });
+    }
+
+    // Initialize the page when loaded
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
