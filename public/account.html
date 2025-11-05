@@ -184,25 +184,25 @@ body {
 const API_BASE = "https://lunov.bot.nu/api";
 const DISCORD_AUTH_URL = `${API_BASE}/auth/discord`;
 
-// When the user clicks "Login with Discord"
 document.getElementById("discordLogin").addEventListener("click", () => {
+  // Redirect to backend Discord OAuth2 route
   window.location.href = DISCORD_AUTH_URL;
 });
 
-// Try fetching user info if logged in
 async function checkAuth() {
   try {
+    // Fetch user info from backend session
     const res = await fetch(`${API_BASE}/me`, { credentials: "include" });
     if (!res.ok) throw new Error("Not logged in");
 
     const data = await res.json();
 
-    // Hide login view and show user info
+    // Hide login view, show user info
     document.getElementById("loginView").style.display = "none";
     const userInfo = document.getElementById("userInfo");
     userInfo.style.display = "flex";
 
-    // Fill in user info
+    // Display Discord credentials
     document.getElementById("userName").textContent = data.username;
     document.getElementById("userTag").textContent = `#${data.discriminator}`;
     document.getElementById("userAvatar").src =
@@ -212,7 +212,7 @@ async function checkAuth() {
   }
 }
 
-// Logout handler
+// Logout route
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await fetch(`${API_BASE}/auth/logout`, { credentials: "include" });
   location.reload();
