@@ -11,7 +11,7 @@ const app = express();
 
 // Allow frontend (lunov dashboard) to access API
 app.use(cors({
-  origin: "https://lunov.rf.gd/",
+  origin: "https://lunov.rf.gd",
   credentials: true,
 }));
 
@@ -20,7 +20,11 @@ app.use(session({
   secret: process.env.SESSION_SECRET || "supersecretkey",
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false }
+  cookie: {
+    secure: true,          // must be true for https
+    httpOnly: true,
+    sameSite: "none"       // critical: allows cross-origin cookies
+  }
 }));
 
 app.use(passport.initialize());
