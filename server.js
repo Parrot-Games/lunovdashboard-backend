@@ -65,6 +65,16 @@ app.get(
   }
 );
 
+app.get("/api/auth/logout", (req, res) => {
+  req.logout(err => {
+    if (err) return res.status(500).json({ error: "Failed to logout" });
+    req.session.destroy(() => {
+      res.clearCookie("connect.sid");
+      res.json({ success: true });
+    });
+  });
+});
+
 app.get("/api/me", (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Not logged in" });
   res.json(req.user);
