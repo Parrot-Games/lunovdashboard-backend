@@ -4,16 +4,15 @@ import passport from "passport";
 import { Strategy as DiscordStrategy } from "passport-discord";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
-import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 const app = express();
 
-// Allow frontend (lunov dashboard) to access API
-app.use(cors({
-  origin: "https://lunov.rf.gd",
-  credentials: true,
-}));
+// Path Setup
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Session setup
 app.use(session({
@@ -23,7 +22,7 @@ app.use(session({
   cookie: {
     secure: true,          // must be true for https
     httpOnly: true,
-    sameSite: "none"       // critical: allows cross-origin cookies
+    sameSite: "lax"       // critical: allows cross-origin cookies
   }
 }));
 
@@ -56,22 +55,13 @@ setInterval(() => {
 }, 5 * 60 * 1000); // Every 5 minutes
 
 // Routes
-app.get("/", (req, res) => {
-  res.send("✅ Lunov backend is online!");
-});
-
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
 app.get("/api/auth/discord", passport.authenticate("discord"));
 
 app.get(
   "/api/auth/discord/callback",
   passport.authenticate("discord", { failureRedirect: "/" }),
   (req, res) => {
-    // Redirect user to lunov frontend dashboard after login
-    res.redirect(`https://lunov.rf.gd/index.html?user=${req.user.id}`);
+    res.redirect(`/account.html`);
   }
 );
 
@@ -92,5 +82,13 @@ app.get("/api/guilds", async (req, res) => {
   res.json(mutual);
 });
 
+// Serve Frontend (static files)
+app.use(express.static(path.join(__dirname, "public")));
+
+// Fallback for all non-API routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Lunov backend running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Lunov backend + frontend running on port ${PORT}`));
