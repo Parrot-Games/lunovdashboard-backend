@@ -181,7 +181,9 @@ body {
 </footer>
 
 <script>
-const API_BASE = "https://lunov.bot.nu/api/auth/discord";
+const API_BASE = "https://lunov.bot.nu/api";
+
+fetch(`${API_BASE}/me`, { credentials: "include" });
 
 document.getElementById("discordLogin").addEventListener("click", () => {
   // Redirect to your backend's Discord OAuth2 route
