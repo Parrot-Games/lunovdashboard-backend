@@ -11,7 +11,7 @@ const app = express();
 
 // Allow frontend (lunov dashboard) to access API
 app.use(cors({
-  origin: "*",
+  origin: "https://lunov.rf.gd/",
   credentials: true,
 }));
 
@@ -20,6 +20,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || "supersecretkey",
   resave: false,
   saveUninitialized: false,
+  cookie: { secure: false }
 }));
 
 app.use(passport.initialize());
@@ -45,9 +46,18 @@ passport.use(
   )
 );
 
+// Keeps the app online
+setInterval(() => {
+  console.log('Keep-alive:', new Date().toISOString());
+}, 5 * 60 * 1000); // Every 5 minutes
+
 // Routes
 app.get("/", (req, res) => {
   res.send("✅ Lunov backend is online!");
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
 });
 
 app.get("/api/auth/discord", passport.authenticate("discord"));
