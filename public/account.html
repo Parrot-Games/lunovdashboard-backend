@@ -213,10 +213,45 @@ header nav a:hover {
     <button class="action-btn" onclick="window.open('https://discord.gg/bQaDPh3fbF','_blank')">Support Server</button>
   </div>
 
-  <div id="servers" class="tab-content">
-    <h2>Your Servers</h2>
-    <div id="serverList">Loading servers...</div>
+  <!-- Servers Tab -->
+<div id="servers" class="tab-content">
+  <h2>Your Servers</h2>
+  <div id="serverList" style="margin-bottom: 40px;">Loading servers...</div>
+
+  <!-- Settings Panel-->
+  <div id="serverSettingsPanel" style="display:none; background:#1e293b; padding:20px; border-radius:12px;">
+    <h3 id="selectedServerName"></h3>
+    <p>Modify Lunov’s configuration for this server:</p>
+    <form id="guildSettingsForm">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+        <div>
+          <label>Prefix</label><br>
+          <input type="text" id="prefix" class="input-field" placeholder="!" style="width:100%;padding:8px;border-radius:8px;border:none;background:#0f172a;color:#fff;">
+        </div>
+        <div>
+          <label>Mute Role ID</label><br>
+          <input type="text" id="muteRole" class="input-field" placeholder="Role ID">
+        </div>
+        <div>
+          <label>Welcome Channel ID</label><br>
+          <input type="text" id="welcomeChannel" class="input-field" placeholder="Channel ID">
+        </div>
+        <div>
+          <label>Leave Channel ID</label><br>
+          <input type="text" id="leaveChannel" class="input-field" placeholder="Channel ID">
+        </div>
+        <div>
+          <label>Log Channel ID</label><br>
+          <input type="text" id="logChannel" class="input-field" placeholder="Channel ID">
+        </div>
+      </div>
+      <br>
+      <button type="submit" class="action-btn">💾 Save Settings</button>
+      <button type="button" class="action-btn" style="background:#64748b;" id="closeSettings">Close</button>
+    </form>
+    <p id="saveStatus" style="margin-top:10px;color:#22c55e;display:none;">✅ Settings saved!</p>
   </div>
+</div>
 
   <div id="settings" class="tab-content settings">
     <h2>Account Settings</h2>
@@ -259,7 +294,7 @@ async function checkAuth() {
         <div class="server-card">
           <img src="https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=128" alt="${g.name}">
           <h4>${g.name}</h4>
-          <button class="manage-btn" onclick="window.location='servers.html?id=${g.id}'">Manage</button>
+          <button class="manage-btn" onclick="manageGuild('${g.id}', '${g.name}')">Manage</button>
         </div>
       `).join('')
       : '<p>No mutual servers found.</p>';
@@ -290,6 +325,64 @@ document.getElementById("inviteBot").addEventListener("click", () => {
 });
 
 checkAuth();
+let selectedGuildId = null;
+
+async function manageGuild(guildId, guildName) {
+  selectedGuildId = guildId;
+  document.getElementById("serverSettingsPanel").style.display = "block";
+  document.getElementById("selectedServerName").textContent = guildName;
+  document.getElementById("saveStatus").style.display = "none";
+
+  try {
+    const res = await fetch(`${API_BASE}/guild/${guildId}`, { credentials: "include" });
+    if (!res.ok) throw new Error("Failed to load guild settings");
+    const guild = await res.json();
+
+    // Fill form
+    document.getElementById("prefix").value = guild.settings?.prefix || "!";
+    document.getElementById("muteRole").value = guild.settings?.muteRole || "";
+    document.getElementById("welcomeChannel").value = guild.settings?.welcomeChannel || "";
+    document.getElementById("leaveChannel").value = guild.settings?.leaveChannel || "";
+    document.getElementById("logChannel").value = guild.settings?.logChannel || "";
+
+  } catch (err) {
+    console.error("Error loading guild:", err);
+    alert("Failed to load server settings.");
+  }
+}
+
+// Save guild settings
+document.getElementById("guildSettingsForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!selectedGuildId) return;
+
+  const payload = {
+    prefix: document.getElementById("prefix").value,
+    muteRole: document.getElementById("muteRole").value,
+    welcomeChannel: document.getElementById("welcomeChannel").value,
+    leaveChannel: document.getElementById("leaveChannel").value,
+    logChannel: document.getElementById("logChannel").value,
+  };
+
+  const res = await fetch(`${API_BASE}/guild/${selectedGuildId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    credentials: "include",
+  });
+
+  if (res.ok) {
+    document.getElementById("saveStatus").style.display = "block";
+    setTimeout(() => (document.getElementById("saveStatus").style.display = "none"), 2500);
+  } else {
+    alert("Failed to save settings.");
+  }
+});
+
+// Close settings panel
+document.getElementById("closeSettings").addEventListener("click", () => {
+  document.getElementById("serverSettingsPanel").style.display = "none";
+});
 </script>
 </body>
 </html>
