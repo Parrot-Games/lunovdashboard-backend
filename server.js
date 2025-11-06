@@ -7,9 +7,12 @@ import fetch from "node-fetch";
 import path from "path";
 import { fileURLToPath } from "url";
 import MongoStore from "connect-mongo";
+import mongoose from "mongoose";
 
+// Setup
 dotenv.config();
 const app = express();
+app.use(express.json());
 
 // Path Setup
 const __filename = fileURLToPath(import.meta.url);
@@ -18,29 +21,47 @@ const __dirname = path.dirname(__filename);
 // Session setup
 app.set("trust proxy", 1); // Required for Render (uses reverse proxy)
 
-app.use(session({
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    mongoOptions: {
-      ssl: true,
-      retryWrites: true,
-      w: "majority",
-      tlsAllowInvalidCertificates: false,
-    },
-    collectionName: "sessions",
-    ttl: 60 * 60 * 24 * 7, // 7 days
-  }),
-  secret: process.env.SESSION_SECRET || "supersecretkey",
-  resave: false,
-  saveUninitialized: false,
-  proxy: true,
-  cookie: {
-    secure: true, // Set to true for HTTPS (Render uses HTTPS)
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 1000 * 60 * 60 * 24 * 7,
+// MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
+
+// Guild Schema
+const GuildSchema = new mongoose.Schema({
+  guildId: { type: String, required: true, unique: true },
+  name: String,
+  icon: String,
+  settings: {
+    prefix: { type: String, default: "!" },
+    muteRole: { type: String, default: "" },
+    welcomeChannel: { type: String, default: "" },
+    leaveChannel: { type: String, default: "" },
+    logChannel: { type: String, default: "" },
   },
-}));
+});
+
+const Guild = mongoose.model("Guild", GuildSchema);
+
+app.use(
+  session({
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+      ttl: 60 * 60 * 24 * 7, // 7 days
+    }),
+    secret: process.env.SESSION_SECRET || "supersecretkey",
+    resave: false,
+    saveUninitialized: false,
+    proxy: true,
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    },
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -64,11 +85,6 @@ passport.use(
     }
   )
 );
-
-// Keep-alive for Render
-setInterval(() => {
-  console.log("🟢 Keep-alive:", new Date().toISOString());
-}, 5 * 60 * 1000);
 
 // ---------------- ROUTES ----------------
 
@@ -107,13 +123,79 @@ app.get("/api/guilds", async (req, res) => {
     const userGuilds = req.user.guilds;
     const botGuilds = await fetch("https://discord.com/api/v10/users/@me/guilds", {
       headers: { Authorization: `Bot ${process.env.BOT_TOKEN}` },
-    }).then(r => r.json());
+    }).then((r) => r.json());
 
-    const mutual = userGuilds.filter(g => botGuilds.find(b => b.id === g.id));
-    res.json(mutual);
+    const mutualGuilds = userGuilds.filter((g) =>
+      botGuilds.find((b) => b.id === g.id)
+    );
+
+    res.json(mutualGuilds);
   } catch (err) {
     console.error("Guild fetch error:", err);
     res.status(500).json({ error: "Failed to fetch guilds" });
+  }
+});
+
+// API: Guild Settings
+
+// Get guild settings
+app.get("/api/guild/:id", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const guildId = req.params.id;
+
+    const guild = req.user.guilds.find(
+      (g) => g.id === guildId && (g.permissions & 0x20)
+    );
+    if (!guild)
+      return res.status(403).json({ error: "Missing MANAGE_GUILD permission" });
+
+    let record = await Guild.findOne({ guildId });
+    if (!record) {
+      record = await Guild.create({
+        guildId,
+        name: guild.name,
+        icon: guild.icon
+          ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+          : null,
+      });
+    }
+
+    res.json(record);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch guild settings" });
+  }
+});
+
+// Update guild settings
+app.post("/api/guild/:id", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const guildId = req.params.id;
+    const { prefix, muteRole, welcomeChannel, leaveChannel, logChannel } =
+      req.body;
+
+    await Guild.findOneAndUpdate(
+      { guildId },
+      {
+        $set: {
+          "settings.prefix": prefix,
+          "settings.muteRole": muteRole,
+          "settings.welcomeChannel": welcomeChannel,
+          "settings.leaveChannel": leaveChannel,
+          "settings.logChannel": logChannel,
+        },
+      },
+      { new: true, upsert: true }
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update guild settings" });
   }
 });
 
