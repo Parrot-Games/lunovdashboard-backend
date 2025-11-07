@@ -199,6 +199,38 @@ app.post("/api/guild/:id", async (req, res) => {
   }
 });
 
+// Set Welcome Channel
+app.post("/api/guild/:id/welcome-channel", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const guildId = req.params.id;
+    const { welcomeChannel } = req.body;
+
+    // Permission check
+    const guild = req.user.guilds.find(
+      (g) => g.id === guildId && (g.permissions & 0x20)
+    );
+    if (!guild)
+      return res.status(403).json({ error: "Missing MANAGE_GUILD permission" });
+
+    const updatedGuild = await Guild.findOneAndUpdate(
+      { guildId },
+      { $set: { "settings.welcomeChannel": welcomeChannel } },
+      { new: true, upsert: true }
+    );
+
+    res.json({
+      success: true,
+      message: `Welcome channel updated to ${welcomeChannel}`,
+      guild: updatedGuild,
+    });
+  } catch (err) {
+    console.error("Welcome channel update error:", err);
+    res.status(500).json({ error: "Failed to update welcome channel" });
+  }
+});
+
 // Serve static frontend
 app.use(express.static(path.join(__dirname, "public")));
 
