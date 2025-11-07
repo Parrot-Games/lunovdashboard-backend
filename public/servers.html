@@ -7,15 +7,235 @@
 <link rel="icon" href="assets/cropped_circle_image.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="style.css">
+
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-light: #6366f1;
+  --dark: #0f111a;
+  --darker: #0b0d14;
+  --gray: #a1a1aa;
+  --gray-light: #d4d4d8;
+  --light: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.08);
+}
+
+/* General layout */
+body {
+  background: var(--dark);
+  color: var(--light);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: rgba(15, 17, 26, 0.9);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 8%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.logo-text a {
+  color: var(--light);
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-decoration: none;
+}
+
+nav a {
+  color: var(--gray-light);
+  text-decoration: none;
+  margin: 0 12px;
+  transition: 0.2s;
+}
+
+nav a:hover, nav a.active {
+  color: var(--primary-light);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-light);
+}
+
+.btn-outline {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+section {
+  padding: 80px 8%;
+}
+
+/* Hero Section */
+.hero.servers-hero {
+  background: linear-gradient(135deg, var(--darker), #1e1b4b);
+  text-align: center;
+  padding: 100px 8%;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  color: var(--gray);
+  font-size: 1.1rem;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* ===== SERVERS LIST SECTION ===== */
+.servers-list {
+  background: linear-gradient(180deg, var(--darker) 0%, var(--dark) 100%);
+}
+
+.servers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  margin-top: 40px;
+}
+
+.server-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 25px;
+  text-align: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.server-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-light);
+  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
+}
+
+.server-icon {
+  border-radius: 50%;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border: 3px solid var(--primary);
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+}
+
+.server-card h3 {
+  color: var(--light);
+  margin-bottom: 5px;
+  font-size: 1.3rem;
+}
+
+.server-card p {
+  font-size: 0.9rem;
+  color: var(--gray);
+  margin-bottom: 20px;
+}
+
+.server-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.loading {
+  text-align: center;
+  color: var(--gray-light);
+  font-size: 1.1rem;
+  margin-top: 2rem;
+}
+
+.loading i {
+  color: var(--primary);
+  margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav {
+    display: none;
+  }
+  .header-container {
+    flex-direction: column;
+  }
+}
+</style>
 </head>
+
 <body>
 
 <!-- Header -->
 <header>
   <div class="header-container">
     <div class="logo">
-      <img class="logo-icon" src="assets/cropped_circle_image.png" alt="Lunov Logo">
+      <img src="assets/cropped_circle_image.png" alt="Lunov Logo">
       <div class="logo-text"><a href="https://lunov.bot.nu/">Lunov</a></div>
     </div>
     <nav>
@@ -24,226 +244,89 @@
       <a href="servers.html" class="active"><i class="fas fa-server"></i> Servers</a>
       <a href="changelogs.html"><i class="fas fa-clipboard-list"></i> Changelogs</a>
       <a href="https://discord.gg/bQaDPh3fbF" target="_blank"><i class="fas fa-headset"></i> Support</a>
-      <a href="/account.html"  class="account-btn"><i class="fas fa-user"></i> Account</a>
+      <a href="/account.html" class="account-btn"><i class="fas fa-user"></i> Account</a>
     </nav>
-    <div class="hamburger" id="hamburger">
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
   </div>
 </header>
 
-<!-- Sidebar (Mobile Navigation) -->
-<div class="sidebar" id="sidebar">
-  <a href="https://lunov.bot.nu/"><i class="fas fa-home"></i> Home</a>
-  <a href="command.html"><i class="fas fa-terminal"></i> Commands</a>
-  <a href="servers.html" class="active"><i class="fas fa-server"></i> Servers</a>
-  <a href="changelogs.html"><i class="fas fa-clipboard-list"></i> Changelogs</a>
-  <a href="https://discord.gg/bQaDPh3fbF" target="_blank"><i class="fas fa-headset"></i> Support</a>
-  <a href="#" id="loginBtn" class="account-btn"><i class="fas fa-user"></i> Account</a>
-</div>
-<div class="overlay" id="overlay"></div>
-
-<!-- Servers Hero Section -->
+<!-- Hero Section -->
 <section class="hero servers-hero">
-  <div class="container">
-    <div class="hero-container">
-      <div class="hero-content fade-in">
-        <h1>Manage Your Discord Servers with Ease</h1>
-        <p>Connect, customize, and control your servers directly from the Lunov Dashboard. Simplify moderation and enhance your community experience.</p>
-        <div class="hero-buttons">
-          <a href="https://discord.com/oauth2/authorize?client_id=1424366813789028412&permissions=268634146&integration_type=0&scope=bot+applications.commands" class="btn btn-primary"><i class="fas fa-plus"></i> Add Lunov to Server</a>
-          <a href="https://lunovdashboard-3acz.onrender.com/" class="btn btn-secondary"><i class="fas fa-cog"></i> Open Dashboard</a>
-        </div>
-      </div>
-      <div class="hero-card fade-in delay-1">
-        <h3><i class="fas fa-chart-bar"></i> Server Overview</h3>
-        <div class="info-item">
-          <span class="info-label">Total Servers</span>
-          <span class="info-value">1+</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Active Users</span>
-          <span class="info-value">500+</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Avg Ping</span>
-          <span class="info-value">65ms</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Status</span>
-          <span class="info-value highlight">Online</span>
-        </div>
-      </div>
-    </div>
+  <h1>Manage Your Discord Servers</h1>
+  <p>Access, customize, and optimize your servers directly from the Lunov Dashboard.</p>
+  <div class="hero-buttons">
+    <a href="https://discord.com/oauth2/authorize?client_id=1424366813789028412&permissions=268634146&scope=bot+applications.commands" class="btn btn-primary">
+      <i class="fas fa-plus"></i> Add Lunov to Server
+    </a>
+    <a href="https://lunovdashboard-3acz.onrender.com/" class="btn btn-outline">
+      <i class="fas fa-cog"></i> Open Dashboard
+    </a>
   </div>
 </section>
 
-<!-- Server Features Section -->
-<section class="features servers-features">
-  <div class="container">
-    <div class="section-title fade-in">
-      <h2>Server Management Features</h2>
-      <p>Everything you need to keep your Discord servers efficient, safe, and fun.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card fade-in">
-        <div class="feature-icon"><i class="fas fa-user-shield"></i></div>
-        <h3>Moderation Panel</h3>
-        <p>Manage bans, mutes, and warnings directly from your dashboard with real-time updates and logs.</p>
-      </div>
-      <div class="feature-card fade-in delay-1">
-        <div class="feature-icon"><i class="fas fa-sliders-h"></i></div>
-        <h3>Custom Settings</h3>
-        <p>Configure welcome messages, auto roles, and command prefixes uniquely for each server.</p>
-      </div>
-      <div class="feature-card fade-in delay-2">
-        <div class="feature-icon"><i class="fas fa-robot"></i></div>
-        <h3>Bot Automation</h3>
-        <p>Automate moderation, event notifications, and community engagement with ease.</p>
-      </div>
-      <div class="feature-card fade-in">
-        <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
-        <h3>Server Insights</h3>
-        <p>Get analytics for member growth, activity tracking, and engagement metrics to understand your community.</p>
-      </div>
-      <div class="feature-card fade-in delay-1">
-        <div class="feature-icon"><i class="fas fa-gamepad"></i></div>
-        <h3>Interactive Add-ons</h3>
-        <p>Enable games, polls, and leaderboards to keep your members active and entertained.</p>
-      </div>
-      <div class="feature-card fade-in delay-2">
-        <div class="feature-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-        <h3>Instant Sync</h3>
-        <p>Changes made on your dashboard instantly reflect on your Discord server through Lunov’s API.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Server List Section -->
+<!-- Servers List -->
 <section class="servers-list">
   <div class="container">
-    <div class="section-title fade-in">
-      <h2>Your Connected Servers</h2>
-      <p>Manage all your Lunov-connected servers from one place.</p>
+    <div class="section-title">
+      <h2>Your Servers</h2>
+      <p>View and manage your Lunov-connected servers below.</p>
     </div>
-    <div class="servers-grid fade-in">
-      <div class="server-card">
-        <img src="assets/discord-server-icon.png" alt="Server Icon" class="server-icon">
-        <h3>Example Server</h3>
-        <p>Members: 124 | Channels: 15</p>
-        <div class="server-actions">
-          <a href="#" class="btn btn-outline"><i class="fas fa-wrench"></i> Manage</a>
-          <a href="#" class="btn btn-primary"><i class="fas fa-chart-line"></i> View Stats</a>
-        </div>
-      </div>
-      <div class="server-card">
-        <img src="assets/discord-server-icon.png" alt="Server Icon" class="server-icon">
-        <h3>Gaming Hub</h3>
-        <p>Members: 231 | Channels: 24</p>
-        <div class="server-actions">
-          <a href="#" class="btn btn-outline"><i class="fas fa-wrench"></i> Manage</a>
-          <a href="#" class="btn btn-primary"><i class="fas fa-chart-line"></i> View Stats</a>
-        </div>
-      </div>
-      <div class="server-card">
-        <img src="assets/discord-server-icon.png" alt="Server Icon" class="server-icon">
-        <h3>Music World</h3>
-        <p>Members: 89 | Channels: 9</p>
-        <div class="server-actions">
-          <a href="#" class="btn btn-outline"><i class="fas fa-wrench"></i> Manage</a>
-          <a href="#" class="btn btn-primary"><i class="fas fa-chart-line"></i> View Stats</a>
-        </div>
-      </div>
+
+    <div id="loading" class="loading fade-in">
+      <i class="fas fa-spinner fa-spin"></i> Loading your servers...
     </div>
+
+    <div id="servers" class="servers-grid" style="display:none;"></div>
   </div>
 </section>
 
-<!-- Footer -->
-<footer>
-  <div class="container">
-    <div class="footer-content">
-      <div class="footer-main">
-        <div class="footer-brand">
-          <div class="footer-logo">
-            <img src="assets/cropped_circle_image.png" alt="Lunov Logo">
-            <span>Lunov</span>
-          </div>
-          <p>A powerful multipurpose Discord bot designed to enhance your server management and community engagement.</p>
-        </div>
-        <div class="footer-links">
-          <div class="footer-column">
-            <h4>Navigation</h4>
-            <a href="/index">Home</a>
-            <a href="/command">Commands</a>
-            <a href="/servers">Servers</a>
-            <a href="/changelogs">Changelogs</a>
-          </div>
-          <div class="footer-column">
-            <h4>Resources</h4>
-            <a href="https://discord.gg/bQaDPh3fbF" target="_blank">Support Server</a>
-            <a href="#">Documentation</a>
-            <a href="https://discord.com/oauth2/authorize?client_id=1424366813789028412&permissions=268634146&integration_type=0&scope=bot+applications.commands">Invite Lunov</a>
-            <a href="#">Status</a>
-          </div>
-          <div class="footer-column">
-            <h4>Legal</h4>
-            <a href="terms-of-services">Terms of Service</a>
-            <a href="privacy-policy">Privacy Policy</a>
-            <a href="#">Cookie Policy</a>
-            <a href="#">GDPR</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <div>&copy; 2025 Lunov Dashboard. All Rights Reserved.</div>
-        <div class="footer-bottom-links">
-          <a href="https://lunov.bot.nu/">Home</a>
-          <a href="commands.html">Commands</a>
-          <a href="changelogs.html">Changelogs</a>
-          <a href="https://discord.gg/bQaDPh3fbF" target="_blank">Support</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
-
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) {
-    loginBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.location.href = "https://lunovdashboard-3acz.onrender.com/";
+async function loadServers() {
+  try {
+    const res = await fetch("https://lunovdashboard-3acz.onrender.com/api/servers", { credentials: "include" });
+    const loading = document.getElementById("loading");
+    const serversGrid = document.getElementById("servers");
+
+    if (!res.ok) {
+      loading.innerHTML = "⚠️ Please log in to view your servers.";
+      return;
+    }
+
+    const servers = await res.json();
+    serversGrid.innerHTML = "";
+
+    if (servers.length === 0) {
+      loading.innerHTML = "😕 No servers found. Try adding Lunov to one of your servers.";
+      return;
+    }
+
+    servers.forEach(server => {
+      const icon = server.icon
+        ? `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png?size=128`
+        : "assets/discord-server-icon.png";
+
+      serversGrid.innerHTML += `
+        <div class="server-card">
+          <img src="${icon}" alt="${server.name}" class="server-icon">
+          <h3>${server.name}</h3>
+          <p>ID: ${server.id}</p>
+          <div class="server-actions">
+            <a href="https://lunovdashboard-3acz.onrender.com/manage/${server.id}" class="btn btn-primary">
+              <i class="fas fa-wrench"></i> Manage
+            </a>
+          </div>
+        </div>
+      `;
     });
+
+    loading.style.display = "none";
+    serversGrid.style.display = "grid";
+  } catch (err) {
+    document.getElementById("loading").innerHTML = "⚠️ Failed to load servers.";
+    console.error(err);
   }
+}
 
-  window.addEventListener('scroll', () => {
-    const header = document.querySelector('header');
-    if (window.scrollY > 50) header.classList.add('scrolled');
-    else header.classList.remove('scrolled');
-  });
-
-  const hamburger = document.getElementById('hamburger');
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('overlay');
-
-  if (hamburger && sidebar && overlay) {
-    hamburger.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
-      hamburger.classList.toggle('active');
-    });
-
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-      hamburger.classList.remove('active');
-    });
-  }
-});
+document.addEventListener("DOMContentLoaded", loadServers);
 </script>
 
 </body>
