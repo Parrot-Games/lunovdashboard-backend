@@ -136,7 +136,35 @@ app.get("/api/guilds", async (req, res) => {
   }
 });
 
-// API: Guild Settings
+// Get guild channels
+app.get("/api/discord/:guildId/channels", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const guildId = req.params.guildId;
+
+    // Permission check
+    const guild = req.user.guilds.find(
+      (g) => g.id === guildId && (g.permissions & 0x20) // MANAGE_GUILD
+    );
+    if (!guild) return res.status(403).json({ error: "Missing permissions" });
+
+    // Fetch channels from Discord API
+    const channels = await fetch(
+      `https://discord.com/api/v10/guilds/${guildId}/channels`,
+      {
+        headers: {
+          Authorization: `Bot ${process.env.BOT_TOKEN}`,
+        },
+      }
+    ).then((r) => r.json());
+
+    res.json(channels);
+  } catch (err) {
+    console.error("Channels fetch error:", err);
+    res.status(500).json({ error: "Failed to fetch channels" });
+  }
+});
 
 // Get guild settings
 app.get("/api/guild/:id", async (req, res) => {
