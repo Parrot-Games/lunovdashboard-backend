@@ -259,20 +259,94 @@ app.post("/api/guild/:id/welcome-channel", async (req, res) => {
     if (!guild)
       return res.status(403).json({ error: "Missing MANAGE_GUILD permission" });
 
-    const updatedGuild = await Guild.findOneAndUpdate(
-      { guildId },
-      { $set: { "settings.welcomeChannel": welcomeChannel } },
-      { new: true, upsert: true }
+    // Get the database connection
+    const db = mongoose.connection.db;
+    
+    // Save exactly like bot does - using the same collection and structure
+    const result = await db.collection("guild_settings").updateOne(
+      { _id: "welcome_channels" },
+      { 
+        $set: { 
+          [`channels.${guildId}`]: welcomeChannel 
+        } 
+      },
+      { upsert: true }
     );
 
+    console.log(`Welcome channel saved for guild ${guildId}: ${welcomeChannel}`);
+    console.log(`MongoDB result:`, result);
+    
     res.json({
       success: true,
-      message: `Welcome channel updated to ${welcomeChannel}`,
-      guild: updatedGuild,
+      message: `Welcome channel set to ${welcomeChannel}`,
+      guildId,
+      welcomeChannel,
+      savedTo: "guild_settings collection (bot format)"
     });
   } catch (err) {
-    console.error("Welcome channel update error:", err);
-    res.status(500).json({ error: "Failed to update welcome channel" });
+    console.error("Welcome channel save error:", err);
+    res.status(500).json({ error: "Failed to save welcome channel: " + err.message });
+  }
+});
+
+// Debug endpoint to check welcome channels in bot format
+app.get("/api/debug/welcome-channels", async (req, res) => {
+  try {
+    const db = mongoose.connection.db;
+    
+    // Check bot-style welcome channels
+    const botWelcomeData = await db.collection("guild_settings").findOne(
+      { _id: "welcome_channels" }
+    );
+    
+    // Check dashboard-style welcome channels
+    const dashboardWelcomeData = await Guild.find({ 
+      "settings.welcomeChannel": { $ne: "" } 
+    }).select("guildId settings.welcomeChannel");
+    
+    res.json({
+      bot_format: {
+        collection: "guild_settings",
+        document_id: "welcome_channels", 
+        data: botWelcomeData || { message: "No welcome channels set in bot format" },
+        guildCount: botWelcomeData ? Object.keys(botWelcomeData.channels || {}).length : 0
+      },
+      dashboard_format: {
+        collection: "guilds",
+        data: dashboardWelcomeData,
+        guildCount: dashboardWelcomeData.length
+      },
+      connection: {
+        database: mongoose.connection.db.databaseName,
+        state: mongoose.connection.readyState
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Test endpoint to verify MongoDB connection
+app.get("/api/debug/mongodb", async (req, res) => {
+  try {
+    const adminDb = mongoose.connection.db.admin();
+    const pingResult = await adminDb.ping();
+    
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    const collectionNames = collections.map(c => c.name);
+    
+    res.json({
+      mongodb: pingResult.ok === 1 ? "✅ Connected" : "❌ Disconnected",
+      database: mongoose.connection.db.databaseName,
+      collections: collectionNames,
+      connectionState: mongoose.connection.readyState
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: "MongoDB test failed",
+      message: error.message,
+      connectionState: mongoose.connection.readyState
+    });
   }
 });
 
