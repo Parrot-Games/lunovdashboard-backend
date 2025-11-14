@@ -24,7 +24,9 @@ app.set("trust proxy", 1); // Required for Render (uses reverse proxy)
 
 // MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    dbName: 'lunov'  // Force using lunov database
+  })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
@@ -54,6 +56,7 @@ app.use(
   session({
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
+      dbName: 'lunov',
       collectionName: "sessions",
       ttl: 60 * 60 * 24 * 7, // 7 days
     }),
