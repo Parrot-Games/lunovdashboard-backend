@@ -405,7 +405,7 @@ async function manageGuild(guildId, guildName) {
         </div>
       </div>
       <br>
-      <button type="submit" class="action-btn">💾 Save Settings</button>
+      <button type="submit" class="action-btn">Save Settings</button>
       <button type="button" class="action-btn" style="background:#64748b;" id="closeSettings">Close</button>
     `;
 
@@ -421,32 +421,54 @@ async function manageGuild(guildId, guildName) {
   }
 }
 
-// Save guild settings
+// Save guild settings - CORRECTED VERSION
 document.getElementById("guildSettingsForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!selectedGuildId) return;
 
-  const payload = {
-    prefix: document.getElementById("prefix").value,
-    muteRole: document.getElementById("muteRole").value || null,
-    welcomeChannel: document.getElementById("welcomeChannel").value || null,
-    leaveChannel: document.getElementById("leaveChannel").value || null,
-    logChannel: document.getElementById("logChannel").value || null,
-  };
+  const prefix = document.getElementById("prefix").value;
+  const muteRole = document.getElementById("muteRole").value || null;
+  const welcomeChannel = document.getElementById("welcomeChannel").value || null;
+  const leaveChannel = document.getElementById("leaveChannel").value || null;
+  const logChannel = document.getElementById("logChannel").value || null;
 
   try {
-    const res = await fetch(`${API_BASE}/guild/${selectedGuildId}`, {
+    // Save general settings to dashboard database
+    const generalRes = await fetch(`${API_BASE}/guild/${selectedGuildId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        prefix,
+        muteRole,
+        welcomeChannel,
+        leaveChannel,
+        logChannel
+      }),
       credentials: "include",
     });
 
-    if (res.ok) {
+    // SPECIAL: Save welcome channel exactly like bot does
+    if (welcomeChannel) {
+      const welcomeRes = await fetch(`${API_BASE}/guild/${selectedGuildId}/welcome-channel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ welcomeChannel }),
+        credentials: "include",
+      });
+
+      if (!welcomeRes.ok) {
+        throw new Error("Failed to save welcome channel to bot database");
+      }
+    }
+
+    if (generalRes.ok) {
       document.getElementById("saveStatus").style.display = "block";
-      setTimeout(() => (document.getElementById("saveStatus").style.display = "none"), 2500);
+      document.getElementById("saveStatus").textContent = "✅ Settings saved! (Both dashboard and bot)";
+      setTimeout(() => {
+        document.getElementById("saveStatus").style.display = "none";
+      }, 3500);
     } else {
-      const error = await res.text();
+      const error = await generalRes.text();
       alert(`Failed to save settings: ${error}`);
     }
   } catch (err) {
