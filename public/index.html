@@ -63,7 +63,7 @@
             <span class="stat-label">Commands</span>
           </div>
           <div class="stat">
-            <span class="stat-number">1</span>
+            <span class="stat-number" id="serverCount">Loading...</span>
             <span class="stat-label">Servers</span>
           </div>
           <div class="stat">
@@ -277,7 +277,16 @@ document.addEventListener('DOMContentLoaded', () => {
     observer.observe(el);
   });
 });
-    
+
+fetch("/api/bot/stats")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("serverCount").innerText = data.serverCount;
+  })
+  .catch(() => {
+    document.getElementById("serverCount").innerText = "Error";
+  });
+  
 </script>
 
 </body>
